@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'parse_tree'
 require 'sexp_processor'
+#gem 'ruby2ruby', '1.1.6'
 require 'ruby2ruby'
 require 'timeout'
 require 'tempfile'
@@ -21,7 +22,7 @@ class Heckle < SexpProcessor
   ##
   # The version of Heckle you are using.
 
-  VERSION = '1.4.3'
+  VERSION = '1.4.4'
 
   ##
   # Branch node types.
@@ -77,6 +78,7 @@ class Heckle < SexpProcessor
   attr_accessor :mutation_count # :nodoc:
   attr_accessor :node_count # :nodoc:
   attr_accessor :original_tree # :nodoc:
+  attr_accessor :current_code
 
   @@debug = false
   @@guess_timeout = true
@@ -210,6 +212,7 @@ class Heckle < SexpProcessor
             puts "Error: #{e.message} with: #{klass_name}##{method_name}: #{exp_copy.inspect}"
             raise e
           end
+    @current_code = src.deep_clone
 
     original = Ruby2Ruby.new.process(@original_tree.deep_clone)
     @reporter.replacing(klass_name, method_name, original, src) if @@debug
@@ -597,10 +600,6 @@ class Heckle < SexpProcessor
     end
 
     sum
-  end
-
-  def current_code
-    Ruby2Ruby.translate(klass_name.to_class, method_name)
   end
 
   ##
